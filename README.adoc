@@ -1,0 +1,154 @@
+= Order Project Overview
+Wiktor Surala <wiktor@surala.de>
+
+== Introduction
+
+The **Order Project** is a backend service developed to demonstrate my programming skills by simulating an order management system for an e-commerce platform. This project highlights my ability to design and implement a functional and scalable backend solution using modern technologies.
+
+== Project Description
+
+The Order Project is designed to handle customer orders in an online store. It receives order requests, retrieves product information, stores the orders securely, and communicates with other systems to ensure smooth order processing.
+
+== Key Features
+
+* **User-Friendly Order Submission**
+** Customers can place orders through a simple web interface that sends order details to the backend service.
+
+* **Product Information Retrieval**
+** The service fetches detailed information about each product in the order to ensure accuracy and provide comprehensive order data.
+
+* **Secure Order Storage**
+** Orders are saved in a MongoDB database, ensuring that all order information is stored reliably and can be accessed when needed.
+
+* **Seamless Communication with Other Systems**
+** After saving an order, the service sends the order details to a messaging system (RabbitMQ) to allow other applications, such as inventory or billing systems, to process the order further.
+
+* **Reliable and Maintainable Code**
+** Implemented using Kotlin, the project emphasizes clean and efficient code.
+** Comprehensive unit tests ensure that the Order Service functions correctly and reliably.
+
+== Technologies Used
+
+* **Kotlin:** A modern programming language that offers safety and conciseness, making the code easier to read and maintain.
+* **AsciiDoc (Adoc):** Used for creating clear and structured project documentation.
+* **WireMock:** A tool that simulates the Catalog Service, allowing for testing and development without needing the actual service.
+* **RabbitMQ:** A messaging system that enables different parts of the application to communicate smoothly and efficiently.
+* **MongoDB:** A NoSQL database chosen for its flexibility in handling data, making it easier to store and manage order information.
+* **REST API:** A straightforward way for different parts of the application to communicate over the web.
+* **Jackson JSON:** A library used to handle JSON data, ensuring that information is correctly formatted and processed.
+* **Unit Tests:** Thorough tests for the Order Service to verify that each part of the service works as intended, enhancing reliability and maintainability.
+
+== Project Workflow
+
+. **Receiving an Order**
+* When a customer places an order, the Order Project receives the order details through a REST API.
+
+. **Fetching Product Details**
+* The service retrieves detailed information about each product in the order to ensure all data is accurate and complete.
+
+. **Storing the Order**
+* The complete order information is securely saved in a MongoDB database, ensuring that all orders are stored reliably.
+
+. **Communicating with Other Systems**
+* Once the order is saved, the service sends the order details to RabbitMQ, allowing other systems like inventory management or billing to process the order further.
+
+== How to Test
+
+To ensure the Order Project functions correctly and to run the application locally, the project utilizes Docker containers managed through Gradle tasks. This setup provides an easy and consistent way to simulate the necessary services.
+
+=== Setting Up the Local Environment
+
+The project includes multiple Gradle tasks that simplify the process of starting necessary Docker containers. These containers simulate the various services the Order Project interacts with.
+
+* **Start RabbitMQ**
+** **Task:** `startRabbitmq`
+** **Description:** Initializes a RabbitMQ container to handle messaging between services.
+
+* **Start MongoDB**
+** **Task:** `startMongoDB`
+** **Description:** Launches a MongoDB container to store order data securely.
+
+* **Start WireMock**
+** **Task:** `startWiremock`
+** **Description:** Starts a WireMock container to simulate the Catalog Service, allowing for product information retrieval during testing.
+
+=== Running the Docker Containers
+
+. **Install Docker:** Ensure Docker is installed on your machine. You can download it from [Docker's official website](https://www.docker.com/get-started).
+
+. **Navigate to the Project Directory:** Open your terminal and navigate to the root directory of the Order Project.
+
+. **Start the Services:** Execute the following Gradle tasks to start the necessary Docker containers:
+
+[source,sh]
+----
+./gradlew startRabbitmq
+./gradlew startMongoDB
+./gradlew startWiremock
+----
+
+These commands will launch RabbitMQ, MongoDB, and WireMock containers respectively.
+
+=== Configuring the Containers
+
+The project provides flexibility to adjust the configurations of each Docker container to suit different testing needs. Configuration files are located in the `configuration` folder, with each container having its own separate file:
+
+* **RabbitMQ Configuration:** `configuration/rabbitmq.conf`
+* **MongoDB Configuration:** `configuration/mongodb.conf`
+* **WireMock Configuration:** `configuration/wiremock.conf`
+
+You can modify these files to change settings such as ports, memory allocation, or specific service behaviors.
+
+=== Running the Application Locally
+
+With the Docker containers running, you can start the Order Project locally to interact with the simulated services:
+
+[source,sh]
+----
+./gradlew bootRun
+This command will launch the Order Service, allowing you to submit orders and see the integrated systems in action.
+----
+
+=== Running Unit Tests
+
+The Order Project includes comprehensive unit tests to ensure the Order Service operates correctly. These tests can be run independently of the Docker containers.
+
+Execute Unit Tests: Run the following Gradle command to execute the unit tests:
+
+sh
+Code kopieren
+./gradlew test
+The unit tests are designed to validate that each part of the Order Service functions as expected, ensuring the reliability and correctness of the project.
+
+=== Stopping the Docker Containers
+
+After testing or running the application locally, you can stop the Docker containers using the following Gradle tasks:
+
+[source,sh]
+----
+./gradlew stopRabbitmq
+./gradlew stopMongoDB
+./gradlew stopWiremock
+----
+
+This will gracefully shut down the RabbitMQ, MongoDB, and WireMock services.
+
+== Why This Project?
+
+This project showcases my ability to build a complete backend service from scratch, demonstrating skills in:
+
+- Programming: Writing clean and efficient code in Kotlin.
+- System Design: Creating a scalable and reliable architecture that can handle real-world scenarios.
+- Integration: Connecting different technologies and services to work together seamlessly.
+- Testing: Ensuring the quality and reliability of the service through thorough testing.
+
+== Future Improvements
+
+- Implementing the Catalog Service: Replace the simulated service with a real Catalog Service for live product data.
+- Enhancing Security: Add authentication and authorization to protect the API and data.
+- Expanding Features: Incorporate additional functionalities like order tracking.
+- Creating User Interface: Develop a more user-friendly front-end for order submission and management.
+
+== Conclusion
+
+The Order Project is a comprehensive backend service that effectively demonstrates my programming abilities and understanding of modern backend technologies. By integrating various tools and practices, the project provides a solid foundation for a real-world e-commerce order management system.

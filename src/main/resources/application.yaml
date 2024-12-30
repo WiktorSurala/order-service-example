@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: Order Service
+  data:
+    mongodb:
+      #uri: mongodb://admin:secret@localhost:27017/orders?authSource=admin&authMechanism=SCRAM-SHA-1
+      host: localhost
+      port: 27017
+      database: orders
+      username: admin
+      password: secret
+      authentication-database: admin
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+catalog-service:
+  url: "http://localhost:8089"    # The base URL for the Catalog Service
+  connectTimeout: 5               # Connection timeout in seconds
+  readTimeout: 10                 # Read timeout in seconds

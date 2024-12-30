@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/products/details",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$.productIds[0]"
+      },
+      {
+        "doesNotMatchJsonPath": "$.productIds[?(@ == '')]"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "response-success.json"
+  }
+}

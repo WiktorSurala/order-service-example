@@ -20,15 +20,36 @@ repositories {
 	mavenCentral()
 }
 
+tasks.test {
+	useJUnitPlatform()
+}
+
+
 dependencies {
+	// Existing dependencies
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	// Testing dependencies
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude(group = "org.mockito", module = "mockito-core")
+		exclude(group = "org.mockito", module = "mockito-junit-jupiter")
+	}
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.amqp:spring-rabbit-test")
+	testImplementation("com.ninja-squad:springmockk:4.0.2")
+
+	// Testcontainer
+	testImplementation("org.testcontainers:junit-jupiter:1.20.0")
+	testImplementation("org.testcontainers:mongodb:1.20.0")
+	testImplementation("org.testcontainers:rabbitmq:1.20.0")
+
+	// JUnit Platform Launcher
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -40,3 +61,4 @@ kotlin {
 
 apply(from = "rabbitmq.gradle.kts")
 apply(from = "mongo.gradle.kts")
+apply(from = "wiremock.gradle.kts")

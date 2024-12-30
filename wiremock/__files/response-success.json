@@ -1,0 +1,7 @@
+{
+  "products": [
+    { "id": "prod001", "name": "Product A", "price": 10.0, "stock": 100 },
+    { "id": "prod002", "name": "Product B", "price": 20.0, "stock": 200 },
+    { "id": "prod003", "name": "Product C", "price": 30.0, "stock": 300 }
+  ]
+}

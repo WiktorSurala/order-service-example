@@ -27,6 +27,7 @@ class DockerHelper(private val execOperations: ExecOperations) {
     }
 
     fun startContainer(
+        repositoryName: String?,
         imageName: String,
         imageTag: String,
         containerName: String,
@@ -34,6 +35,9 @@ class DockerHelper(private val execOperations: ExecOperations) {
         environmentMap: Map<String, String?>,
         volumeMap: Map<String, String>
     ) {
+        val defaultWorkingDir = System.getProperty("user.dir")
+        println("Default Working Directory: $defaultWorkingDir")
+
         val containerStatus = getContainerStatus(containerName)
         if (containerStatus.isEmpty()) {
             println("$containerName container not found. Starting a new container...")
@@ -57,7 +61,12 @@ class DockerHelper(private val execOperations: ExecOperations) {
                 commandLineArguments.add("$key:$value")
             }
 
-            commandLineArguments.add("$imageName:$imageTag")
+            val imageReference = if (repositoryName.isNullOrBlank()) {
+                "$imageName:$imageTag"
+            } else {
+                "$repositoryName/$imageName:$imageTag"
+            }
+            commandLineArguments.add(imageReference)
 
             execCommand(commandLineArguments)
         } else if (containerStatus.contains("Exited")) {

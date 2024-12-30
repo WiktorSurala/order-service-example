@@ -1,0 +1,4 @@
+{
+  "error": "Invalid product IDs",
+  "message": "One or more product IDs provided do not exist."
+}
