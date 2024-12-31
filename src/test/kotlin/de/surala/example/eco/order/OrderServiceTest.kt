@@ -1,4 +1,5 @@
 import de.surala.example.eco.order.data.catalog.ProductDetails
+import de.surala.example.eco.order.data.catalog.ProductDetailsList
 import de.surala.example.eco.order.data.db.Order
 import de.surala.example.eco.order.data.db.OrderProduct
 import de.surala.example.eco.order.dto.OrderRequest
@@ -20,15 +21,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.postForEntity
 import java.time.LocalDateTime
-import java.util.UUID
-import java.util.Optional
+import java.util.*
 import kotlin.test.Test
 
 @ExtendWith(SpringExtension::class)
@@ -104,18 +102,21 @@ class OrderServiceTest {
 
         every { orderRepository.save(any<Order>()) } returns defaultOrder
         every { rabbitTemplate.convertAndSend("order.exchange", "order.created", any<Order>()) } just Runs
-        // Mock RestTemplate.postForEntity
-        val mockedProductDetails = listOf(
-            ProductDetails(id = "prod1", name = "Product 1", price = 10.0, stock = 100),
-            ProductDetails(id = "prod2", name = "Product 2", price = 20.0, stock = 200)
+
+        val mockedProductDetails = ProductDetailsList(
+            listOf(
+                ProductDetails(id = "prod1", name = "Product 1", price = 10.0, stock = 100),
+                ProductDetails(id = "prod2", name = "Product 2", price = 20.0, stock = 200)
+            )
         )
+
         val mockedResponseEntity = ResponseEntity.ok(mockedProductDetails)
 
         every {
-            catalogServiceRestTemplate.postForEntity<List<ProductDetails>>(
+            catalogServiceRestTemplate.postForEntity(
                 "/products/details",
                 any<HttpEntity<ProductIdRequest>>(),
-                any<ParameterizedTypeReference<List<ProductDetails>>>()
+                ProductDetailsList::class.java
             )
         } returns mockedResponseEntity
 
