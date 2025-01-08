@@ -3,12 +3,9 @@
     "method": "POST",
     "url": "/products/details",
     "bodyPatterns": [
-      {
-        "matchesJsonPath": "$.productIds[0]"
-      },
-      {
-        "doesNotMatchJsonPath": "$.productIds[?(@ == '')]"
-      }
+      { "matchesJsonPath": "$.productIds[?(@ == 'prod001')]" },
+      { "matchesJsonPath": "$.productIds[?(@ == 'prod002')]" },
+      { "matchesJsonPath": "$.productIds[?(@ == 'prod003')]" }
     ]
   },
   "response": {
@@ -17,5 +14,6 @@
       "Content-Type": "application/json"
     },
     "bodyFileName": "response-success.json"
-  }
+  },
+  "priority": 1
 }

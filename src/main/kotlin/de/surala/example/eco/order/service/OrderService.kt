@@ -1,6 +1,7 @@
 package de.surala.example.eco.order.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import de.surala.example.eco.order.data.catalog.ErrorResponse
 import de.surala.example.eco.order.data.catalog.ProductDetails
 import de.surala.example.eco.order.data.catalog.ProductDetailsList
 import de.surala.example.eco.order.data.db.Order
@@ -10,6 +11,8 @@ import de.surala.example.eco.order.dto.OrderResponse
 import de.surala.example.eco.order.dto.ProductIdRequest
 import de.surala.example.eco.order.dto.ProductProcessingResult
 import de.surala.example.eco.order.dto.ProductRequest
+import de.surala.example.eco.order.exception.InvalidProductIdException
+import de.surala.example.eco.order.exception.OrderNotFoundException
 import de.surala.example.eco.order.repository.OrderRepository
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Qualifier
@@ -19,6 +22,10 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpClientErrorException
 
 @Service
 class OrderService(
@@ -26,6 +33,8 @@ class OrderService(
     @Qualifier("catalogServiceRestTemplate") private val catalogServiceRestTemplate: RestTemplate,
     private val rabbitTemplate: RabbitTemplate
 ) {
+    val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
     fun createOrder(request: OrderRequest): OrderResponse {
         // Fetch product details from Catalog Service
         val products = processOrder(request)
@@ -109,6 +118,8 @@ class OrderService(
     }
 
     fun fetchProductDetails(productIds: List<String>): ProductDetailsList {
+        logger.info("Fetching product details for productIds: {}", productIds)
+
         // Construct the request body
         val requestBody = ProductIdRequest(productIds)
 
@@ -119,19 +130,47 @@ class OrderService(
         val objectMapper = ObjectMapper()
         val jsonBody: String = objectMapper.writeValueAsString(requestBody)
 
+        // Log request details
+        logger.debug("Request body: {}", jsonBody)
+        logger.debug("Request headers: {}", headers)
+
         // Create HttpEntity with headers and body
         val requestEntity = HttpEntity(jsonBody, headers)
 
-        // Make POST request
-        val response: ResponseEntity<ProductDetailsList> = catalogServiceRestTemplate.postForEntity(
-            "/products/details",
-            requestEntity,
-            ProductDetailsList::class.java
-        )
+        try {
+            // Log before sending the request
+            logger.info("Sending POST request to /products/details")
 
+            // Make POST request
+            val response: ResponseEntity<ProductDetailsList> = catalogServiceRestTemplate.postForEntity(
+                "/products/details",
+                requestEntity,
+                ProductDetailsList::class.java
+            )
 
-        // Return response body or throw an exception
-        return response.body ?: throw RuntimeException("Failed to fetch product details")
+            // Log response details
+            logger.info("Received response with status code: {}", response.statusCode)
+            logger.debug("Response body: {}", response.body)
+
+            // Return response body or throw an exception
+            return response.body ?: throw RuntimeException("Failed to fetch product details")
+        } catch (ex: HttpClientErrorException) {
+            // Handle 400 Bad Request specifically
+            if (ex.statusCode == HttpStatus.BAD_REQUEST) {
+                logger.error("Bad Request: {}", ex.responseBodyAsString)
+
+                // Parse the error response (if needed)
+                val errorResponse = objectMapper.readValue(ex.responseBodyAsString, ErrorResponse::class.java)
+                throw InvalidProductIdException("Invalid product IDs: ${errorResponse.message}")
+            } else {
+                logger.error("Client error occurred: {}", ex.message)
+                throw ex
+            }
+        } catch (ex: Exception) {
+            // Log and rethrow other exceptions
+            logger.error("An error occurred while fetching product details: {}", ex.message)
+            throw ex
+        }
     }
 
     fun updateOrderStatus(orderId: String, updatedStatus: String): OrderResponse {
@@ -145,5 +184,3 @@ class OrderService(
     }
 
 }
-
-class OrderNotFoundException(message: String) : RuntimeException(message)

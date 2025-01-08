@@ -3,6 +3,8 @@ package de.surala.example.eco.order.configuration
 import jakarta.annotation.PostConstruct
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
@@ -31,10 +33,12 @@ data class ServiceCatalogProperties(
 
     var apiKey: String = ""
 ) {
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
     @PostConstruct
     fun init() {
-        println("Catalog Service URL: $url")
-        println("Connect Timeout: $connectTimeout seconds")
-        println("Read Timeout: $readTimeout seconds")
+        logger.debug("Catalog Service URL: $url")
+        logger.debug("Connect Timeout: $connectTimeout seconds")
+        logger.debug("Read Timeout: $readTimeout seconds")
     }
 }

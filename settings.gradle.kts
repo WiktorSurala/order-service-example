@@ -1,1 +1,8 @@
-rootProject.name = "e-commerce-system-example-order"
+pluginManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "order-service-example"

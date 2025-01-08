@@ -5,6 +5,7 @@ plugins {
 	kotlin("plugin.spring") version "1.9.25"
 	id("org.springframework.boot") version "3.4.0"
 	id("io.spring.dependency-management") version "1.1.6"
+	id("de.surala.containertool.docker-plugin") version "1.0.0"
 }
 
 group = "de.surala.example.eco"
@@ -59,6 +60,37 @@ kotlin {
 	}
 }
 
-apply(from = "rabbitmq.gradle.kts")
-apply(from = "mongo.gradle.kts")
-apply(from = "wiremock.gradle.kts")
+docker {
+	mainGroupName = "Docker"
+
+	container {
+		group = "Database"
+		name = "mongoDB"
+		image = "mongo"
+		tag = "latest"
+		ports[27017] = 27017
+		environments["MONGO_INITDB_ROOT_USERNAME"] = "admin"
+		environments["MONGO_INITDB_ROOT_PASSWORD"] = "secret"
+		volumes["mongo-data"] = "/data/db"
+	}
+
+	container {
+		group = "Mock"
+		name = "wiremock"
+		image = "wiremock/wiremock"
+		tag = "latest"
+		ports[8089] = 8080
+		volumes[".\\wiremock"] = "/home/wiremock"
+	}
+
+	container {
+		group = "RabbitMQ"
+		name = "rabbitmq"
+		image = "rabbitmq"
+		tag = "3-management"
+		ports[5672] = 5672
+		ports[15672] = 15672
+		environments["RABBITMQ_DEFAULT_USER"] = "guest"
+		environments["RABBITMQ_DEFAULT_PASS"] = "guest"
+	}
+}

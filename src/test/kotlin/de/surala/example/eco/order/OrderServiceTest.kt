@@ -6,8 +6,8 @@ import de.surala.example.eco.order.dto.OrderRequest
 import de.surala.example.eco.order.dto.OrderResponse
 import de.surala.example.eco.order.dto.ProductIdRequest
 import de.surala.example.eco.order.dto.ProductRequest
+import de.surala.example.eco.order.exception.OrderNotFoundException
 import de.surala.example.eco.order.repository.OrderRepository
-import de.surala.example.eco.order.service.OrderNotFoundException
 import de.surala.example.eco.order.service.OrderService
 import io.mockk.Runs
 import io.mockk.every
